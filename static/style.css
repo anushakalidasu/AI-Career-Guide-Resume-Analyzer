@@ -1680,3 +1680,55 @@ a {
     overflow: hidden;
     pointer-events: none;
 }
+/* ===============================
+   SKILL GAP ANALYSIS - VERSION 2
+   =============================== */
+
+.skill-gap-card {
+    margin-top: 30px;
+    padding: 28px;
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #eeeeee;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+.skill-gap-card h2 {
+    margin-bottom: 24px;
+}
+
+.skill-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.skill-columns > div {
+    padding: 20px;
+    border-radius: 14px;
+    background: #fafafa;
+}
+
+.skill-tag {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 5px;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.skill-tag.matched {
+    background: #e8f7ed;
+    color: #18794e;
+}
+
+.skill-tag.missing {
+    background: #fff1e8;
+    color: #c65320;
+}
+
+@media (max-width: 700px) {
+    .skill-columns {
+        grid-template-columns: 1fr;
+    }
+}

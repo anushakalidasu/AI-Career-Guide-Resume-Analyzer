@@ -181,9 +181,12 @@ async function generateCareerPlan() {
             });
         }
 
-        result.innerHTML = html;
+      result.innerHTML = html;
 
-    } catch (error) {
+// Version 2 - Skill Gap Analysis
+showSkillGap(role, skills);
+
+} catch (error) {
 
         console.error(error);
 
@@ -677,3 +680,102 @@ document.addEventListener(
 
     }
 );
+// ===============================
+// SKILL GAP ANALYSIS - VERSION 2
+// ===============================
+
+function showSkillGap(targetRole, currentSkills) {
+    const result = document.getElementById("skillGapResult");
+
+    if (!result) return;
+
+    const role = targetRole.toLowerCase();
+
+    const roleSkills = {
+        "data analyst": [
+            "SQL",
+            "Excel",
+            "Power BI",
+            "Statistics",
+            "Data Visualization",
+            "Python"
+        ],
+        "hr": [
+            "Communication",
+            "Excel",
+            "Recruitment",
+            "Interviewing",
+            "HR Management",
+            "MS Office"
+        ],
+        "software developer": [
+            "Programming",
+            "Git",
+            "Data Structures",
+            "APIs",
+            "Databases",
+            "Problem Solving"
+        ],
+        "web developer": [
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "Git",
+            "APIs",
+            "Responsive Design"
+        ],
+        "cybersecurity": [
+            "Networking",
+            "Linux",
+            "Cybersecurity Basics",
+            "Python",
+            "Cryptography",
+            "Security Tools"
+        ]
+    };
+
+    let requiredSkills = roleSkills["data analyst"];
+
+    for (const key in roleSkills) {
+        if (role.includes(key)) {
+            requiredSkills = roleSkills[key];
+            break;
+        }
+    }
+
+    const skillsText = currentSkills.toLowerCase();
+
+    const matched = requiredSkills.filter(skill =>
+        skillsText.includes(skill.toLowerCase())
+    );
+
+    const missing = requiredSkills.filter(skill =>
+        !skillsText.includes(skill.toLowerCase())
+    );
+
+    result.innerHTML = `
+        <div class="skill-gap-card">
+            <h2>🎯 Skill Gap Analysis</h2>
+
+            <div class="skill-columns">
+                <div>
+                    <h3>✓ Your Skills</h3>
+                    ${
+                        matched.length
+                        ? matched.map(skill => `<span class="skill-tag matched">${skill}</span>`).join("")
+                        : "<p>No matching skills found yet.</p>"
+                    }
+                </div>
+
+                <div>
+                    <h3>○ Skills to Learn</h3>
+                    ${
+                        missing.length
+                        ? missing.map(skill => `<span class="skill-tag missing">${skill}</span>`).join("")
+                        : "<p>Great! You have covered the main skills.</p>"
+                    }
+                </div>
+            </div>
+        </div>
+    `;
+}
