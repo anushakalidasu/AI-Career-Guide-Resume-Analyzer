@@ -1,0 +1,22 @@
+[
+    {
+        "name": "LinkedIn Jobs",
+        "url": "https://www.linkedin.com/jobs/"
+    },
+    {
+        "name": "Naukri",
+        "url": "https://www.naukri.com/"
+    },
+    {
+        "name": "Indeed",
+        "url": "https://www.indeed.com/"
+    },
+    {
+        "name": "Foundit",
+        "url": "https://www.foundit.in/"
+    },
+    {
+        "name": "Internshala",
+        "url": "https://internshala.com/jobs/"
+    }
+]
