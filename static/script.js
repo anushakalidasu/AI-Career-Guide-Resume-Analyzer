@@ -185,6 +185,7 @@ async function generateCareerPlan() {
 
 // Version 2 - Skill Gap Analysis
 showSkillGap(role, skills);
+createProgressTracker(days);
 
 } catch (error) {
 
@@ -778,4 +779,190 @@ function showSkillGap(targetRole, currentSkills) {
             </div>
         </div>
     `;
+}
+// ======================================================
+// AI INTERVIEW QUESTION GENERATOR - VERSION 2
+// ======================================================
+
+async function generateInterviewQuestions() {
+
+    const result = document.getElementById("interviewResult");
+
+    if (!result) return;
+
+    const roleInput = document.getElementById("target_role");
+    const skillsInput = document.getElementById("skills");
+
+    const role = roleInput ? roleInput.value.trim() : "";
+    const skills = skillsInput ? skillsInput.value.trim() : "";
+
+    if (!role) {
+        result.innerHTML = `
+            <div class="error">
+                Please enter your target role first.
+            </div>
+        `;
+        return;
+    }
+
+    result.innerHTML = `
+        <div class="result-card loading">
+            Generating interview questions...
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch("/api/interview", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                target_role: role,
+                skills: skills
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Could not generate questions."
+            );
+        }
+
+        let html = `
+            <div class="interview-card">
+                <h2>🎤 Interview Preparation</h2>
+                <p>
+                    Practice these questions for your
+                    <strong>${escapeHtml(role)}</strong> role.
+                </p>
+        `;
+
+        data.questions.forEach((item, index) => {
+
+            html += `
+                <div class="interview-question">
+                    <h3>
+                        ${index + 1}. ${escapeHtml(item.question)}
+                    </h3>
+
+                    <div class="interview-answer">
+                        <strong>Sample Answer:</strong>
+                        <p>${escapeHtml(item.answer)}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+
+        result.innerHTML = html;
+
+    } catch (error) {
+
+        console.error(
+            "Interview generation error:",
+            error
+        );
+
+        result.innerHTML = `
+            <div class="error">
+                ${escapeHtml(error.message)}
+            </div>
+        `;
+    }
+}
+// ======================================================
+// 30-DAY PROGRESS TRACKER - VERSION 2
+// ======================================================
+
+function createProgressTracker(days = 30) {
+
+    const container = document.getElementById("progressTracker");
+
+    if (!container) return;
+
+    let completed = JSON.parse(
+        localStorage.getItem("careerProgress") || "[]"
+    );
+
+    function renderTracker() {
+
+        const completedCount = completed.length;
+        const percentage = Math.round(
+            (completedCount / days) * 100
+        );
+
+        let html = `
+            <div class="progress-card">
+
+                <h2>📊 Your Career Progress</h2>
+
+                <div class="progress-info">
+                    <strong>${completedCount}/${days} Days Completed</strong>
+                    <strong>${percentage}%</strong>
+                </div>
+
+                <div class="progress-bar">
+                    <div
+                        class="progress-fill"
+                        style="width: ${percentage}%"
+                    ></div>
+                </div>
+
+                <div class="progress-days">
+        `;
+
+        for (let day = 1; day <= days; day++) {
+
+            const checked = completed.includes(day);
+
+            html += `
+                <label class="progress-day">
+                    <input
+                        type="checkbox"
+                        ${checked ? "checked" : ""}
+                        onchange="toggleProgress(${day}, ${days})"
+                    >
+
+                    <span>
+                        Day ${day}
+                    </span>
+                </label>
+            `;
+        }
+
+        html += `
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    }
+
+    window.toggleProgress = function(day, totalDays) {
+
+        if (completed.includes(day)) {
+
+            completed = completed.filter(
+                item => item !== day
+            );
+
+        } else {
+
+            completed.push(day);
+        }
+
+        localStorage.setItem(
+            "careerProgress",
+            JSON.stringify(completed)
+        );
+
+        renderTracker();
+    };
+
+    renderTracker();
 }

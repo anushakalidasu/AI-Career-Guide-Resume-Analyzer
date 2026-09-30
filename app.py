@@ -693,7 +693,78 @@ def home():
         "index.html"
     )
 
+# =========================================================
+# INTERVIEW QUESTION GENERATOR - VERSION 2
+# =========================================================
 
+@app.post("/api/interview")
+def interview_api():
+
+    data = request.get_json(silent=True) or {}
+
+    role = str(
+        data.get("target_role", "")
+    ).strip()
+
+    skills = str(
+        data.get("skills", "")
+    ).strip()
+
+    if not role:
+        return jsonify({
+            "success": False,
+            "message": "Please enter a target role."
+        }), 400
+
+    prompt = f"""
+You are an interview preparation assistant.
+
+Target Role:
+{role}
+
+Candidate Skills:
+{skills}
+
+Generate exactly 10 interview questions suitable
+for a beginner/fresher applying for this role.
+
+Include a mixture of:
+- Technical questions
+- Practical questions
+- Scenario-based questions
+- One or two HR-style questions
+
+For every question provide a short, easy-to-understand
+sample answer.
+
+Return ONLY valid JSON:
+
+{{
+  "questions": [
+    {{
+      "question": "Question",
+      "answer": "Short sample answer"
+    }}
+  ]
+}}
+"""
+
+    ai_text = call_gemini(prompt)
+    ai_result = parse_json(ai_text)
+
+    if (
+        isinstance(ai_result, dict)
+        and ai_result.get("questions")
+    ):
+        return jsonify({
+            "success": True,
+            "questions": ai_result["questions"]
+        })
+
+    return jsonify({
+        "success": False,
+        "message": "Could not generate interview questions."
+    }), 500
 # =========================================================
 # JSON ERROR HANDLER
 # =========================================================
